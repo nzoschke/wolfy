@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'sinatra/base'
+require 'sequel'
 
 module Sinatra
   module Indexer
@@ -13,6 +14,16 @@ module Sinatra
   end
   
   register Indexer
+end
+
+configure do
+  DB = Sequel.connect(ENV['DATABASE_URL'] || 'sqlite://wolfy.db')
+
+  DB.create_table :user do
+    primary_key :id
+    String      :username
+    String      :password
+  end unless DB.table_exists? :user
 end
 
 get '/' do
@@ -54,6 +65,7 @@ get '/auth' do
 end
 
 get '/db' do
+  DB.tables.inspect
 end
 
 post '/thumb' do
